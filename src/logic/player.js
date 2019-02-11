@@ -1,4 +1,4 @@
-export default class Player extends Array {
+export default class Player extends Object {
     static counter = 0;
 
     constructor (info) {
@@ -9,18 +9,20 @@ export default class Player extends Array {
         this.history = [];
     }
     updateHistory (team) {
-        this.history = this.history.concat(team);
+        this.history = this.history.concat(team.map(player => player.id));
+    }
+    clearHistory () {
+        this.history = [];
     }
     get fitness () {
-        let fitness = 0; // fitness will be square function - meeting the same player over and over againt shoud be punished stronger and stronger 
-        const historyIndexes = this.history.map(el => el.id);
+        let fitness = 0; // fitness will be square function - meeting the same player over and over again shoud be punished stronger and stronger 
 
-        historyIndexes.sort();
+        this.history.sort();
 
         let base = 0;
-        let end = historyIndexes.length - 1;
+        let end = this.history.length - 1;
         for (let i = 0; i < end; i++) {
-            if (historyIndexes[i] == historyIndexes[i + 1]) {
+            if (this.history[i] == this.history[i + 1]) {
                 base++;
             }
             else {

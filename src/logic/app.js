@@ -6,12 +6,12 @@ export default class App {
     //  --- CONFIG ---
 
     popSize = 50;
-    generationsLimit = 1;
+    generationsLimit = 10;
     selectionSize = 3;
     mutationRate = 0.05;
     crossoverRate = 0.4;
-    eventsToMutate = 2;
-    playersToMutate = 3;
+    eventsToMutate = 1;
+    playersToMutate = 1;
 
     //  --------------
 
@@ -25,7 +25,6 @@ export default class App {
             this.population.push(new Adapciak (divisions, players))
         }
         this.costs = this.population.map(adapciak => adapciak.fitness);
-        console.log(this.findBest());
     }
 
     evolve () {
@@ -35,9 +34,9 @@ export default class App {
             //this.crossover(newPopulation);
             this.mutate(newPopulation);
             this.population = newPopulation;
-            this.costs = this.population.map(adapciak => adapciak.fitness);
-            this.stopCondition = this.costs.some(cost => cost === 0);
+            this.costs = this.countCosts();
             this.best = this.findBest();
+            this.stopCondition = this.best.fitness === 0;
             generationIterator++;
             console.log(`Generation #${generationIterator}'s best:`, this.findBest());
         }
@@ -55,12 +54,10 @@ export default class App {
         let winnerIndex = Math.floor(Math.random() * this.popSize);
         let lowestCost = this.costs[winnerIndex];
 
-        for (let i = 0; i < this.selectionSize; i++)
-        {
+        for (let i = 0; i < this.selectionSize; i++) {
             let newIndex = Math.floor(Math.random() * this.popSize);
             let newCost = this.costs[newIndex];
-            if (newCost < lowestCost)
-            {
+            if (newCost < lowestCost) {
                 lowestCost = newCost;
                 winnerIndex = newIndex;
             }
@@ -76,6 +73,15 @@ export default class App {
         population.forEach(adapciak => {
             if (Math.random() < this.mutationRate) adapciak.mutate(this.eventsToMutate, this.playersToMutate)
         })
+    }
+
+    countCosts () {
+        this.updateFitness(); 
+        return this.population.map(adapciak => adapciak.fitness);
+    }
+
+    updateFitness () {
+        this.population.forEach(adapciak => adapciak.updatePlayersHistory());
     }
 
     findBest () {
