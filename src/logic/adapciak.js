@@ -1,6 +1,8 @@
 import Event from './event.js';
 import Player from './player.js';
 
+const _ = require('lodash');
+
 export default class Adapciak extends Array {
 
     constructor (divisions, playersArray) {
@@ -23,18 +25,26 @@ export default class Adapciak extends Array {
            let indexToMutate = Math.floor(Math.random() * this.length);
            this[indexToMutate].mutate(playersToMutate);
         }
+        return this;
+    }
+
+    static crossTwoGetTwo (adapciak1, adapciak2) {
+        console.log('Adapciaki przed krzyżowaniem: ', adapciak1, adapciak2);
+        let numberOfEvents = adapciak1.length;
+        for (let i = 0; i < numberOfEvents; i+=2) {
+            [adapciak1[i], adapciak2[i]] = [adapciak2[i], adapciak1[i]];
+        }
+        console.log('Adapciaki po krzyżowaniu: ', adapciak1, adapciak2);
+        return [adapciak1, adapciak2];
     }
 
     updatePlayersHistory () {
         this.clearPlayersHistory();
         this.newPlayersHistory();
     }
-    
+
     newPlayersHistory () {
-        let numberOfEvents = this.length;   
-        for (let i = 0; i < numberOfEvents; i++) {
-            this[i].updatePlayersHistory();
-        }
+        this.forEach(event => event.updatePlayersHistory());
     }
 
     clearPlayersHistory () {

@@ -28,7 +28,7 @@ export default {
   data: () => {
     return {
       players: [],
-      divisions: [],
+      divisions: [8, 7, 7, 6, 6],
       waitingForCsv: true,
     }
   },

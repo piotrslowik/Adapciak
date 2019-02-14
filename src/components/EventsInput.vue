@@ -35,16 +35,19 @@ export default {
 }
 p {
     margin: 0;
-    font-size: 24px;
+    font-size: 26px;
 }
 input {
-    font-size: 26px;
+    font-size: 30px;
     max-width: 50px;
     margin-left: 30px;
+    padding: 3px;
 }
 button {
     font-size: 20px;
-    padding: 6px 10px;
+    padding: 8px 14px;
     margin-left: 30px;
+    border-radius: 10px;
+    background-image: linear-gradient(-45deg, #a3aace, lightgray);
 }
 </style>

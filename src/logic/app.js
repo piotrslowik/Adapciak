@@ -5,13 +5,13 @@ export default class App {
 
     //  --- CONFIG ---
 
-    popSize = 50;
+    popSize = 100;
     generationsLimit = 10;
-    selectionSize = 3;
+    selectionSize = 5;
     mutationRate = 0.05;
     crossoverRate = 0.4;
-    eventsToMutate = 1;
-    playersToMutate = 1;
+    eventsToMutate = 2;
+    playersToMutate = 2;
 
     //  --------------
 
@@ -25,26 +25,35 @@ export default class App {
             this.population.push(new Adapciak (divisions, players))
         }
         this.costs = this.population.map(adapciak => adapciak.fitness);
+        console.log('Populacja w konstruktorze: ', this.population);
+        console.log('Fitnessy w konstruktorze: ', this.costs);
+        this.c = this.costs.map(el => el).sort();
     }
 
     evolve () {
         let generationIterator = 0;
+
+        // console.log('Minimum: ', this.c[0]);
+        // this.best = this.findBest();
+        // console.log(`Generation #${generationIterator}'s best:`, this.best);
+
         while (generationIterator < this.generationsLimit && !this.stopCondition) {
-            let newPopulation = this.newPopulationByTournament();
-            //this.crossover(newPopulation);
-            this.mutate(newPopulation);
-            this.population = newPopulation;
-            this.costs = this.countCosts();
+            const selectedPopulation = this.newPopulationByTournament();
+            const crossedPopulation = this.crossover(selectedPopulation);
+            const mutatedPopulation = this.mutate(crossedPopulation);
+            this.population = mutatedPopulation;
+            this.updateCosts();
             this.best = this.findBest();
             this.stopCondition = this.best.fitness === 0;
             generationIterator++;
-            console.log(`Generation #${generationIterator}'s best:`, this.findBest());
+            console.log(`Generation #${generationIterator}'s best:`, this.best);
         }
     }
 
     newPopulationByTournament () {
         let newPopulation = [];
-        for (let i = 0; i < this.popSize; i++) {
+        let limit = this.popSize / 2;
+        for (let i = 0; i < limit; i++) {
             newPopulation.push(this.selectByTournament());
         }
         return newPopulation;
@@ -65,19 +74,42 @@ export default class App {
         return this.population[winnerIndex];
     }
 
-    // crossover (population) {
+    crossover (population) {
+        let newPopulation = [];
+        let limit = population.length - 1;
 
-    // }
+        for (let i = 0; i < limit; i++) {
+            if (Math.random() < this.crossoverRate) {
+                const temp = Adapciak.crossTwoGetTwo(population[i], population[i + 1]);
+                newPopulation.push(temp[0], temp[1]);
+            }
+            else newPopulation.push(population[i], population[i + 1]);
+        }
+        if (Math.random() < this.crossoverRate) {
+            const temp = Adapciak.crossTwoGetTwo(population[population.length - 1], population[0]);
+            newPopulation.push(temp[0], temp[1]);
+        }
+        else newPopulation.push(population[population.length - 2], population[0]);
+
+        return newPopulation;
+    }
 
     mutate (population) {
+        const newPopulation = [];
         population.forEach(adapciak => {
-            if (Math.random() < this.mutationRate) adapciak.mutate(this.eventsToMutate, this.playersToMutate)
+            if (Math.random() < this.mutationRate) newPopulation.push(adapciak.mutate(this.eventsToMutate, this.playersToMutate));
+            else newPopulation.push(adapciak);
         })
+        return newPopulation;
+    }
+
+    updateCosts () {
+        this.updateFitness(); 
+        this.countCosts(); 
     }
 
     countCosts () {
-        this.updateFitness(); 
-        return this.population.map(adapciak => adapciak.fitness);
+        this.costs = this.population.map(adapciak => adapciak.fitness);
     }
 
     updateFitness () {
@@ -89,6 +121,9 @@ export default class App {
         for (let i = 0; i < this.popSize; i++) {
             winnerIndex = this.costs[i] < this.costs[winnerIndex] ? i : winnerIndex;
         }
+        // console.log('Indeks dla minimum: ', winnerIndex);
+        // console.log('Fitnesy: ', this.costs);
+        // console.log('Populacja: ', this.population);
         return this.population[winnerIndex];
     }
 }
