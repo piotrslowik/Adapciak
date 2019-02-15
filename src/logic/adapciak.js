@@ -3,14 +3,14 @@ import Player from './player.js';
 
 const _ = require('lodash');
 
-export default class Adapciak extends Array {
+export default class Adapciak {
 
     constructor (divisions, playersArray) {
-        super();
         let numberOfEvents = divisions.length
         this.players = playersArray.map(el => new Player(el));
+        this.events = [];
         for (let i = 0; i < numberOfEvents; i++) {
-            this.push(new Event(divisions[i], this.players))
+            this.events.push(new Event(divisions[i], this.players))
         }
     }
 
@@ -22,19 +22,26 @@ export default class Adapciak extends Array {
 
     mutate (eventsToMutate, playersToMutate) {
         for (let i = 0; i < eventsToMutate; i++) {
-           let indexToMutate = Math.floor(Math.random() * this.length);
-           this[indexToMutate].mutate(playersToMutate);
+           let indexToMutate = Math.floor(Math.random() * this.events.length);
+           this.events[indexToMutate].mutate(playersToMutate);
         }
         return this;
     }
 
     static crossTwoGetTwo (adapciak1, adapciak2) {
-        console.log('Adapciaki przed krzyżowaniem: ', adapciak1, adapciak2);
-        let numberOfEvents = adapciak1.length;
-        for (let i = 0; i < numberOfEvents; i+=2) {
-            [adapciak1[i], adapciak2[i]] = [adapciak2[i], adapciak1[i]];
+        let numberOfEvents = adapciak1.events.length;
+        let events1 = [];
+        let events2 = []
+        for (let i = 0; i < numberOfEvents; i++) {
+            if (i % 2 === 0){
+                events1.push(adapciak1.events.pop());
+                events2.push(adapciak2.events.pop());
+            } else {
+                events1.push(adapciak1.events.pop());
+                events2.push(adapciak2.events.pop());
+            }
         }
-        console.log('Adapciaki po krzyżowaniu: ', adapciak1, adapciak2);
+        [adapciak1.events, adapciak2.events] = [events2.reverse(), events1.reverse()];
         return [adapciak1, adapciak2];
     }
 
@@ -44,7 +51,7 @@ export default class Adapciak extends Array {
     }
 
     newPlayersHistory () {
-        this.forEach(event => event.updatePlayersHistory());
+        this.events.forEach(event => event.updatePlayersHistory());
     }
 
     clearPlayersHistory () {

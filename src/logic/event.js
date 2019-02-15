@@ -41,10 +41,14 @@ export default class Event extends Array {
             let playerToMutate1 = Math.floor(Math.random() * this[teamToMutate1].length);
             let playerToMutate2 = Math.floor(Math.random() * this[teamToMutate2].length);
 
+            let player1 = this[teamToMutate1].slice(playerToMutate1, 1);
+            let player2 = this[teamToMutate2].slice(playerToMutate2, 1);
+
             //console.log(`Zespół ${teamToMutate1} przed mutacją: `, this[teamToMutate1]);
             //console.log(`Gracz ${playerToMutate1} zespołu ${teamToMutate1} przed mutacją: `, this[teamToMutate1][playerToMutate1]);
 
-            [this[teamToMutate1][playerToMutate1], this[teamToMutate2][playerToMutate2]] = [this[teamToMutate2][playerToMutate2], this[teamToMutate1][playerToMutate1]];
+            this[teamToMutate1].push(player2);
+            this[teamToMutate2].push(player1);
 
             //console.log('team: ', teamToMutate1, ' gracz ', playerToMutate1, ' | team: ', teamToMutate2, ' gracz ', playerToMutate2);
             //console.log('Po mutacji: ', this);
