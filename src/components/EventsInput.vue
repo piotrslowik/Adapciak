@@ -44,6 +44,9 @@ input {
     padding: 3px;
 }
 button {
+    text-shadow: 1px 1px 4px black;
+    color: white;
+    font-weight: 900;
     font-size: 20px;
     padding: 8px 14px;
     margin-left: 30px;
