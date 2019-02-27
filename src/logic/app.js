@@ -1,15 +1,15 @@
 /* eslint-disable no-console */
-import Adapciak from './adapciak.js';
+import Adapciak from './models/adapciak.js';
 
 export default class App {
 
     //  --- CONFIG ---
 
-    popSize = 100;
+    popSize = 10;
     generationsLimit = 10;
-    selectionSize = 5;
-    mutationRate = 0.05;
-    crossoverRate = 0.4;
+    selectionSize = 3;
+    mutationRate = 0.5;
+    crossoverRate = 0.6;
     eventsToMutate = 2;
     playersToMutate = 2;
 
@@ -26,26 +26,27 @@ export default class App {
         }
         this.costs = this.population.map(adapciak => adapciak.fitness);
         console.log('Populacja w konstruktorze: ', this.population);
-        console.log('Fitnessy w konstruktorze: ', this.costs);
-        this.c = this.costs.map(el => el).sort();
+        //console.log('Fitnessy w konstruktorze: ', this.costs);
+        //this.c = this.costs.map(el => el).sort();
     }
 
     evolve () {
         let generationIterator = 0;
 
-        // console.log('Minimum: ', this.c[0]);
-        // this.best = this.findBest();
-        // console.log(`Generation #${generationIterator}'s best:`, this.best);
+        //console.log('Minimum: ', this.c[0]);
+        this.best = this.findBest();
+        console.log(`Generation #${generationIterator}'s best:`, this.best);
 
         while (generationIterator < this.generationsLimit && !this.stopCondition) {
             const selectedPopulation = this.newPopulationByTournament();
             const crossedPopulation = this.crossover(selectedPopulation);
-            const mutatedPopulation = this.mutate(crossedPopulation);
-            this.population = mutatedPopulation;
+            //this.mutate(crossedPopulation);
+            this.population = crossedPopulation;
             this.updateCosts();
             this.best = this.findBest();
             this.stopCondition = this.best.fitness === 0;
             generationIterator++;
+            console.log('Population: ', this.population);
             console.log(`Generation #${generationIterator}'s best:`, this.best);
         }
     }
@@ -95,17 +96,23 @@ export default class App {
     }
 
     mutate (population) {
-        const newPopulation = [];
+        //const newPopulation = [];
         population.forEach(adapciak => {
-            if (Math.random() < this.mutationRate) newPopulation.push(adapciak.mutate(this.eventsToMutate, this.playersToMutate));
-            else newPopulation.push(adapciak);
-        })
-        return newPopulation;
+            if (Math.random() < this.mutationRate) adapciak.mutate(this.eventsToMutate, this.playersToMutate);
+            //if (Math.random() < this.mutationRate) newPopulation.push(adapciak.mutate(this.eventsToMutate, this.playersToMutate));
+            //else newPopulation.push(adapciak);
+        });
+        //return newPopulation;
     }
 
     updateCosts () {
+        this.updatePlayersList();
         this.updateFitness(); 
         this.countCosts(); 
+    }
+
+    updatePlayersList () {
+        this.population.forEach(adapciak => adapciak.updatePlayersList());
     }
 
     countCosts () {
