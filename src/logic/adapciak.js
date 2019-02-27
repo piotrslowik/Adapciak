@@ -1,7 +1,9 @@
+/* eslint-disable no-console */
+
 import Event from './event.js';
 import Player from './player.js';
 
-const _ = require('lodash');
+//const _ = require('lodash');
 
 export default class Adapciak {
 
@@ -16,26 +18,31 @@ export default class Adapciak {
 
     get fitness () {
         let fitness = 0;
-        this.players.forEach(player => fitness += player.fitness); 
+        this.players.forEach(player => fitness += Player.fitness(player)); 
         return fitness
     }
 
-    mutate (eventsToMutate, playersToMutate) {
-        const mutated = this.events.map(event => event);
-        for (let i = 0; i < eventsToMutate; i++) {
+    static mutate (adapciak, config) {
+        const mutated = Object.assign([], adapciak.events)
+
+        for (let i = 0; i < config.eventsToMutate; i++) {
            let indexToMutate = Math.floor(Math.random() * mutated.length);
-           mutated[indexToMutate].mutate(playersToMutate);
+           Event.mutate(mutated[indexToMutate], config.playersToMutate);
         }
-        this.events = mutated;
+
+        adapciak.events = mutated;
     }
 
     static crossTwoGetTwo (adapciak1, adapciak2) {
         console.log('Przed krosem:', adapciak1, adapciak2);
         const numberOfEvents = adapciak1.events.length;
+
         const events1 = [];
         const events2 = [];
-        const newAdapciak1 = Object.assign(adapciak1);
-        const newAdapciak2 = Object.assign(adapciak2);
+
+        const newAdapciak1 = Object.setPrototypeOf(JSON.parse(JSON.stringify(adapciak1)), adapciak1);
+        const newAdapciak2 = Object.setPrototypeOf(JSON.parse(JSON.stringify(adapciak2)), adapciak2);
+
         for (let i = 0; i < numberOfEvents; i++) {
             if (i % 2 === 0){
                 events1.push(newAdapciak1.events.pop());
@@ -58,22 +65,22 @@ export default class Adapciak {
     //     return [adapciak1, adapciak2];
     // }
 
-    updatePlayersHistory () {
-        this.clearPlayersHistory();
-        this.newPlayersHistory();
+    static updatePlayersHistory (adapciak) {
+        Adapciak.clearPlayersHistory(adapciak);
+        Adapciak.newPlayersHistory(adapciak);
     }
     
-    clearPlayersHistory () {
-        this.players.forEach(player => player.clearHistory());
+    static clearPlayersHistory (adapciak) {
+        adapciak.players.forEach(player => Player.clearHistory(player));
     }
 
-    newPlayersHistory () {
-        this.events.forEach(event => event.updatePlayersHistory());
+    static newPlayersHistory (adapciak) {
+        adapciak.events.forEach(event => Event.updatePlayersHistory(event));
     }
     
-    updatePlayersList () {
+    static updatePlayersList (adapciak) {
         const players = [];
-        this.events[0].forEach(team => team.forEach(player => players.push(player)));
-        this.players = players;
+        adapciak.events[0].forEach(team => team.forEach(player => players.push(player)));
+        adapciak.players = players;
     }
 }

@@ -25,7 +25,7 @@ export default class Event extends Array {
                 playersIterator++;
             }
 
-            this[i].updatePlayersHistory();
+            Team.updatePlayersHistory(this[i]);
         }
     }
 
@@ -51,20 +51,20 @@ export default class Event extends Array {
     //     }
     // }
 
-    mutate (PlayersToMutate) {
-        for (let i = 0; i < PlayersToMutate; i++) {
-            let teamToMutate1 = Math.floor(Math.random() * this.length);
-            let teamToMutate2 = Math.floor(Math.random() * this.length);
+    static mutate (event, playersToMutate) {
+        for (let i = 0; i < playersToMutate; i++) {
+            let teamToMutate1 = Math.floor(Math.random() * event.length);
+            let teamToMutate2 = Math.floor(Math.random() * event.length);
 
-            let playerToMutate1 = Math.floor(Math.random() * this[teamToMutate1].length);
-            let playerToMutate2 = Math.floor(Math.random() * this[teamToMutate2].length);
+            let playerToMutate1 = Math.floor(Math.random() * event[teamToMutate1].length);
+            let playerToMutate2 = Math.floor(Math.random() * event[teamToMutate2].length);
 
-            [this[teamToMutate1][playerToMutate1], this[teamToMutate2][playerToMutate2]] = [this[teamToMutate2][playerToMutate2], this[teamToMutate1][playerToMutate1]];
+            [event[teamToMutate1][playerToMutate1], event[teamToMutate2][playerToMutate2]] = [event[teamToMutate2][playerToMutate2], event[teamToMutate1][playerToMutate1]];
         }
     }
 
-    updatePlayersHistory () {
-        this.forEach(team => team.updatePlayersHistory());
+    static updatePlayersHistory (event) {
+        event.forEach(team => Team.updatePlayersHistory(team));
     }
 
     static shuffle = (array) => {

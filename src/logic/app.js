@@ -1,17 +1,22 @@
 /* eslint-disable no-console */
-import Adapciak from './models/adapciak.js';
+import Adapciak from './adapciak.js';
 
 export default class App {
 
     //  --- CONFIG ---
 
-    popSize = 10;
+    popSize = 50;
     generationsLimit = 10;
+
     selectionSize = 3;
+
     mutationRate = 0.5;
     crossoverRate = 0.6;
-    eventsToMutate = 2;
-    playersToMutate = 2;
+
+    mutationConfig = {
+        eventsToMutate: 2,
+        playersToMutate: 2,
+    }
 
     //  --------------
 
@@ -61,18 +66,18 @@ export default class App {
     }
 
     selectByTournament () {
-        let winnerIndex = Math.floor(Math.random() * this.popSize);
+        let winnerIndex = Math.floor(Math.random() * this.population.length);
         let lowestCost = this.costs[winnerIndex];
 
         for (let i = 0; i < this.selectionSize; i++) {
-            let newIndex = Math.floor(Math.random() * this.popSize);
+            let newIndex = Math.floor(Math.random() * this.population.length);
             let newCost = this.costs[newIndex];
             if (newCost < lowestCost) {
                 lowestCost = newCost;
                 winnerIndex = newIndex;
             }
         }
-        return this.population[winnerIndex];
+        return this.population.splice(winnerIndex, 1)[0];
     }
 
     crossover (population) {
@@ -98,7 +103,7 @@ export default class App {
     mutate (population) {
         //const newPopulation = [];
         population.forEach(adapciak => {
-            if (Math.random() < this.mutationRate) adapciak.mutate(this.eventsToMutate, this.playersToMutate);
+            if (Math.random() < this.mutationRate) adapciak.mutate(adapciak, this.mutationConfig);
             //if (Math.random() < this.mutationRate) newPopulation.push(adapciak.mutate(this.eventsToMutate, this.playersToMutate));
             //else newPopulation.push(adapciak);
         });
@@ -112,7 +117,7 @@ export default class App {
     }
 
     updatePlayersList () {
-        this.population.forEach(adapciak => adapciak.updatePlayersList());
+        this.population.forEach(adapciak => Adapciak.updatePlayersList(adapciak));
     }
 
     countCosts () {
@@ -120,7 +125,7 @@ export default class App {
     }
 
     updateFitness () {
-        this.population.forEach(adapciak => adapciak.updatePlayersHistory());
+        this.population.forEach(adapciak => Adapciak.updatePlayersHistory(adapciak));
     }
 
     findBest () {

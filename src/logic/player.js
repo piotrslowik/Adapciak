@@ -8,21 +8,21 @@ export default class Player extends Object {
         this.surname = info[1];
         this.history = [];
     }
-    updateHistory (team) {
-        this.history = this.history.concat(team.map(player => player.id));
+    static updateHistory (player, team) {
+        player.history = player.history.concat(team.map(mate => mate.id));
     }
-    clearHistory () {
-        this.history = [];
+    static clearHistory (player) {
+        player.history = [];
     }
-    get fitness () {
+    static fitness = (player) => {
         let fitness = 0; // fitness will be square function - meeting the same player over and over again shoud be punished stronger and stronger 
 
-        this.history.sort();
+        player.history.sort();
 
         let base = 0;
-        let end = this.history.length - 1;
+        let end = player.history.length - 1;
         for (let i = 0; i < end; i++) {
-            if (this.history[i] == this.history[i + 1]) {
+            if (player.history[i] == player.history[i + 1]) {
                 base++;
             }
             else {
