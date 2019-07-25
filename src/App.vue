@@ -1,11 +1,13 @@
 <template>
   <div id="app">
-    <Header text="Testing" />
-    <PlayersInput v-if="waitingForCsv" @addedPlayers="playersWereAdded" />
+    <Header text="AdapciakoDzielnik" />
+    <PlayersInput v-if="!players.length" @addedPlayers="playersWereAdded" />
     <EventsInput v-else @addedEvent="eventWasAdded" />
     <Divisions v-bind:data="divisions" @deletedEvent="eventWasDeleted" />
-    <button class="start-button" @click="startApp">START</button>
-    <button v-if="false" class="test-button" @click="doTest">TEST</button>
+    <button v-if="false" class="start-button" @click="startApp">START</button>
+    <button v-if="players.length" class="start-button" @click="doTest">THINK</button>
+    <button v-if="adapciak.events" class="print-button" @click="print">PRINT</button>
+    <Stats v-if="adapciak.events" v-bind:adapciak="this.adapciak" />
   </div>
 </template>
 
@@ -14,8 +16,12 @@ import Header from './components/Header.vue'
 import PlayersInput from './components/PlayersInput.vue'
 import EventsInput from './components/EventsInput.vue'
 import Divisions from './components/Divisions.vue'
+import Stats from './components/Stats.vue'
 
 import App from './logic/app.js';
+import printDivisions from './logic/printer.js';
+import getRepeatsStats from './logic/stats.js';
+
 
 export default {
   name: 'App',
@@ -24,12 +30,14 @@ export default {
     PlayersInput,
     EventsInput,
     Divisions,
+    Stats,
   },
   data: () => {
     return {
       players: [],
       divisions: [8, 7, 7, 6, 6],
-      waitingForCsv: true,
+      adapciak: [],
+      app: null,
     }
   },
   methods: {
@@ -43,10 +51,9 @@ export default {
       this.players = data;
       console.log('Wczytani gracze: ');
       console.table(this.players);
-      this.waitingForCsv = false;
     },
     startApp: function () {
-      const app = new App (this.divisions, this.players);
+      if (!this.app) this.app = new App (this.divisions, this.players);
       app.evolve();
       
       // const adapciak = app.best;
@@ -56,8 +63,12 @@ export default {
       // });
       // console.log('Chujowość tego układu: ', adapciak.fitness);
     },
-    doTest: function () {
-      console.log('Test button działa!');
+    doTest: async function () {
+      if (!this.app) this.app = new App(this.divisions, this.players);
+      this.adapciak = await this.app.generateRandomly(this.divisions, this.players);
+    },
+    print: function () {
+      printDivisions(this.adapciak);
     }
   }
 }
@@ -82,7 +93,20 @@ html {
   padding: 10px 16px;
   border-radius: 10px;
   border-color: white;
-  border-size: 3px;
+  border-width: 2px;
   background-image: linear-gradient(-45deg, #283a5e, blue);
+  margin-right: 20px;
+  min-width: 112px;
+}
+.print-button {
+  font-size: 25px;
+  font-weight: bold;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border-color: white;
+  border-width: 2px;
+  background-image: linear-gradient(-45deg, rgb(94, 69, 40), rgb(134, 110, 29));
+  min-width: 112px;
 }
 </style>

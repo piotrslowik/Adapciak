@@ -11,11 +11,6 @@
 export default {
     name: 'Divisions',
     props: ['data'],
-    computed: {
-        numbers: function () {
-            return this.data
-        }
-    },
     methods: {
         deleteEvent: function (index) {
             this.$emit('deletedEvent', index);

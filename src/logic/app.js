@@ -30,6 +30,7 @@ export default class App {
             this.population.push(new Adapciak (divisions, players))
         }
         this.costs = this.population.map(adapciak => adapciak.fitness);
+        this.best = this.findBest();
         console.log('Populacja w konstruktorze: ', this.population);
         //console.log('Fitnessy w konstruktorze: ', this.costs);
         //this.c = this.costs.map(el => el).sort();
@@ -54,6 +55,17 @@ export default class App {
             console.log('Population: ', this.population);
             console.log(`Generation #${generationIterator}'s best:`, this.best);
         }
+    }
+
+    async generateRandomly (divisions, players) {
+        for (let i = 0; i < 10000; i++) {
+            const adapciak = new Adapciak (divisions, players)
+            if (adapciak.fitness < this.best.fitness) {
+                this.best = adapciak;
+                console.log('nowy debeściak', this.best.fitness);
+            }
+        }
+        return this.best;
     }
 
     newPopulationByTournament () {
